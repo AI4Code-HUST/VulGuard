@@ -1,0 +1,7 @@
+in*
+out*
+log
+test*
+temp
+*.sh
+__pycache__

@@ -1,0 +1,22 @@
+name: my_env
+channels:
+  - pytorch
+  - pyg
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pandas
+  - numpy
+  - matplotlib
+  - scikit-learn
+  - scipy
+  - gensim
+  - tqdm
+  - graphviz
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=12.2  # Updated to CUDA 12.2
+  - pyg  # PyTorch Geometric
+
