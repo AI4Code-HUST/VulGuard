@@ -1,6 +1,6 @@
 # VCC Finder
 
-This is the replication of VCC Finder
+This is the replication of VCC Finder.
 
 ## Requirements
 - [SALLY](https://github.com/rieck/sally)
