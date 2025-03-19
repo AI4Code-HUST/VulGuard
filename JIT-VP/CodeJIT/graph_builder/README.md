@@ -3,7 +3,7 @@
 This is the implemtation to build CTG for CodeJIT for any commit without labeling.
 
 ## Requirements:
-- Joern v1.1.1193
+- [Joern v1.1.1193](https://github.com/joernio/joern/releases/tag/v1.1.1193)
 - srcML
 - git
 - jdk 11

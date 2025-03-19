@@ -1,14 +1,6 @@
 # JIT-DP models
 
-To conduct JIT-DP models' experiments, we utilized a modified version of Defectguard.
-
-## About
-
-- DefectGuard is a python package
-- Basic functionalities:
-  - Mining commits from Git repositories
-  - Post-processing, training, inferencing JITDP model via CLI or import library
-- DefectGuard had been integrated into VSC _(extension)_, Jenkins & GitHub Action _(via command)_
+This is the replication of JIT-DP models.
 
 ## Installation
 
