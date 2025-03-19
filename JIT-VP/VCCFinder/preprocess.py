@@ -19,7 +19,11 @@ if os.path.exists(POST_SALLY_DIR):
 if os.path.exists(WORKSPACE):
     shutil.rmtree(WORKSPACE)
     
+
+vcc_file = f"PATH/HERE/SETUP1-FFmpegvcc-features-train.jsonl"
+patch_file = f"PATH/HERE/SETUP1-FFmpeg-simcom-train.jsonl" 
         
+
 def find_files(regex_pattern: str, folder: str):
     pattern = re.compile(regex_pattern)
     matching_files = []
@@ -170,3 +174,6 @@ def main(vcc_file, patch_file):
         os.remove(os.path.join(WORKSPACE, file))
         os.remove(os.path.join(WORKSPACE, "one_line.libsvm"))
     print("***********************")
+    
+if __name__ == "__main__":
+    main(vcc_file, patch_file)

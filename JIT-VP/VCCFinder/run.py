@@ -2,10 +2,17 @@ import pandas as pd
 from sklearn.datasets import load_svmlight_file
 from sklearn.svm import LinearSVC
 from sklearn.metrics import (
-    f1_score, accuracy_score, precision_score, recall_score, roc_auc_score, precision_recall_curve, auc, matthews_corrcoef
+    f1_score, roc_auc_score, precision_recall_curve, auc, matthews_corrcoef
 )
 from scipy.sparse import csr_matrix
 import pickle
+  
+train_file = f"PATH/HERE/SETUP1-FFmpeg-features-train.libsvm"
+test_file = f"PATH/HERE/SETUP1-FFmpeg-features-test.libsvm"
+model_path = f"model/vccfinder.pkl"
+predictions = f"predict_scores/vccfinder.csv"
+results = f"results/results.csv"  
+  
   
 def get_commit_id_list(file):
     commit_id_list = list()
@@ -71,3 +78,11 @@ def run(train_file, test_file, mode):
         
 
     return classif, out_df, score_df
+
+if __name__ == "__main__":  
+    classif, out_df, score_df = run(train_file, test_file, "all")
+    with open(model_path, "wb") as f:
+        pickle.dump(classif, f)
+    out_df.to_csv(predictions, index=False)
+    score_df.to_csv(results, index=False)
+            
