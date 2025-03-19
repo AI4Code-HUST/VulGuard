@@ -1,0 +1,7 @@
+__pycache__/*
+data/git_repository_data
+data/dependency_output2
+data/diff_output
+data/extracted_output
+data/jit_vul_dataset
+data/joern_parsed_output
