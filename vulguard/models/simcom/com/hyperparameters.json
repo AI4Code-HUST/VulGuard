@@ -1,0 +1,11 @@
+{
+  "message_length": 256,
+  "code_line": 10,
+  "code_length": 512,
+  "embedding_size": 64,
+  "filter_sizes": "1,2,3",
+  "num_filters": 64,
+  "hidden_size": 512,
+  "dropout_rate": 0.5,
+  "batch_size": 1
+}

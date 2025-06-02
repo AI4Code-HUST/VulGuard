@@ -1,0 +1,34 @@
+name: vulguard
+channels:
+  - defaults
+  - conda-forge
+  - nvidia
+  - pytorch
+
+dependencies:
+  - python=3.11   # Latest version of Python
+  - cudatoolkit=11.8  # CUDA toolkit for GPU access
+  - pip
+  - pip:
+      - gdown==5.1.0
+      - icecream==2.1.3
+      - imblearn==0.0
+      - numpy==1.24.4
+      - pandas==2.0.3
+      - PyGithub==2.1.1
+      - PyYAML==5.3.1
+      - scikit_learn==1.2.2
+      - scipy==1.10.1
+      - setuptools==67.8.0
+      - torch==2.1.0
+      - GitPython==3.1.7
+      - PyDriller==1.15.2
+      - options==1.4.10
+      - testresources==2.0.1
+      - dateparser==0.7.6
+      - networkx==2.6.3
+      - beautifulsoup4==4.10.0
+      - lxml
+      - packaging==21.3
+      - regex==2022.1.18
+      - python-Levenshtein==0.12.2
