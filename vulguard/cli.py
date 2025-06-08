@@ -30,7 +30,7 @@ def main(args=None):
     modes = ["local", "remote"]
 
     common_parser = argparse.ArgumentParser(add_help=False)
-    common_parser.add_argument("-dg_save_folder", default=".", type=str, help="")
+    common_parser.add_argument("-dg_cache", default=".", type=str, help="")
     common_parser.add_argument("-mode", type=str, default="local", help="Mode of extractor", choices=modes)
     common_parser.add_argument("-repo_name", type=str, default=None, help="Repo name")
     common_parser.add_argument("-repo_path", type=str, default=None, help="Path to git repository")
@@ -82,7 +82,7 @@ def main(args=None):
     evaluating_parser.add_argument("-size_file", type=str, default=None, help="File include number of added line and deleted line of each commit to get effort metrics.")
     evaluating_parser.add_argument("-device", type=str, default="cpu", help="Eg: cpu, cuda, cuda:1")
 
-    parser = argparse.ArgumentParser(prog="DefectGuard", description="A tool for mining, training, evaluating for Just-in-Time Defect Prediction")
+    parser = argparse.ArgumentParser(prog="VulGuard", description="A tool for mining, training, evaluating for Just-in-Time Vulnerability Prediction")
     parser.add_argument("-version", action="version", version="%(prog)s " + __version__)
     parser.add_argument("-debug", action="store_true", help="Turn on system debug print")
     parser.add_argument("-log_to_file", action="store_true", help="Logging to file instead of stdout")
