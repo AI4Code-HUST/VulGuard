@@ -9,6 +9,7 @@ dependencies:
   - python=3.11   # Latest version of Python
   - cudatoolkit=11.8  # CUDA toolkit for GPU access
   - pip
+  - srcml
   - pip:
       - gdown==5.1.0
       - icecream==2.1.3

@@ -3,25 +3,25 @@ from abc import ABC, abstractmethod
 class BaseWraper(ABC):
 
     @abstractmethod
-    def initialize(self):
+    def initialize(self,  **kwarg):
         pass
 
     @abstractmethod
-    def preprocess(self, data):
+    def preprocess(self, **kwarg):
         pass
 
     @abstractmethod
-    def postprocess(self, commit_ids, inference_output, threshold):
+    def postprocess(self, **kwarg):
         pass
 
     @abstractmethod
-    def train(self, train_df, val_df):
+    def train(self, **kwarg):
         pass
     
     @abstractmethod
-    def inference(self, infer_df, threshold):
+    def inference(self, **kwarg):
         pass
     
     @abstractmethod
-    def save(self, save_dir):
+    def save(self, **kwarg):
         pass

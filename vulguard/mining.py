@@ -1,4 +1,4 @@
-import os
+from .utils.utils import create_dg_cache
 from .utils.logger import logger
 from .crawler import Pipeline
 from argparse import Namespace
@@ -6,16 +6,8 @@ from argparse import Namespace
 def mining(params):
     logger("Start VulGuard")
     print("Start VulGuard")
-
-    # create save folders
-    dg_cache_path = f"{params.dg_save_folder}/dg_cache"
-    folders = ["save", "repo", "dataset"]
-    if not os.path.exists(dg_cache_path):
-        os.mkdir(dg_cache_path)
-    for folder in folders:
-        if not os.path.exists(os.path.join(dg_cache_path, folder)):
-            os.mkdir(os.path.join(dg_cache_path, folder))
-
+    dg_cache_path = create_dg_cache(params.dg_save_folder)
+    
     # User's input handling
     assert params.repo_name is not None, "Please provide the miner with repo_name"
     

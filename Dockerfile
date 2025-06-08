@@ -44,5 +44,5 @@ ENV PATH="/opt/joern/joern-cli:${PATH}"
 
 ENV TZ=US/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-RUN pip install -r requirements.txt
+RUN pip install --ignore-installed -r requirements.txt
 RUN python3 setup.py develop

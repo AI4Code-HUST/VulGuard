@@ -5,22 +5,21 @@ from vulguard.utils.utils import  SRC_PATH
 import pandas as pd
 
 class LAPredict(BaseWraper):
-    def __init__(self, language, **kwarg):
+    def __init__(self, language):        
         self.model_name = 'lapredict'
         self.language = language
         self.initialized = False
-        self.model = sk_LogisticRegression(class_weight='balanced', max_iter=1000)
+        self.model = None
         self.columns = (["la"])
-        self.default_save = f"{SRC_PATH}/models/metadata/{self.model_name}/{self.language}"
         self.default_input = "Kamei_features"
                 
-    def initialize(self, model_path=None, **kwarg):
-        if model_path is not None:
-            self.model = pickle.load(open(f"{model_path}/la.pkl", "rb"))
+    def initialize(self, **kwarg):
+        model_path = kwarg.get("model_path")
+        if model_path is None:
+            self.model = sk_LogisticRegression(class_weight='balanced', max_iter=1000)
         else:
-            self.model = pickle.load(open(f"{self.default_save}/la.pkl", "rb"))
+            self.model = pickle.load(open(f"{model_path}/la.pkl", "rb"))
 
-        # Set initialized to True
         self.initialized = True
         
     def preprocess(self, data, **kwarg):         
@@ -43,19 +42,15 @@ class LAPredict(BaseWraper):
         return result
     
     def inference(self, infer_df, threshold, **kwarg):
-        if not self.initialized:
-            self.initialize()
-        
         commit_ids, features, _ = self.preprocess(infer_df)
         outputs = self.model.predict_proba(features)[:, 1]
         final_prediction = self.postprocess(commit_ids, outputs, threshold)
         
         return final_prediction
     
-    def train(self, train_df, val_df, **kwarg):
-        commit_ids, data, label = self.preprocess(train_df)
+    def train(self, train_df, **kwarg):
+        _ , data, label = self.preprocess(train_df)
         self.model.fit(data, label)        
-        return self.model
     
     def save(self, save_dir, **kwarg):
         if not os.path.isdir(save_dir):       
