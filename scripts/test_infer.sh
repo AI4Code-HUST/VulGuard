@@ -6,5 +6,5 @@ vulguard inferencing \
     -model_path dg_cache/save/libssh2 \
     -infer_set dg_cache/dataset/libssh2/data/test_merge_libssh2.jsonl \
     -dictionary dg_cache/dataset/libssh2/dict_libssh2.jsonl \
-    -dg_cache . \
+    -dg_save_folder . \
     -device cuda

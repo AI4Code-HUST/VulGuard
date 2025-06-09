@@ -6,5 +6,5 @@ vulguard mining \
     -mode local \
     -repo_language C \
     -szz vszz \
-    -dg_cache . \
+    -dg_save_folder . \
     -workers 10

@@ -1,11 +1,8 @@
 #!/bin/bash
 
 vulguard evaluating \
-    -model deepjit \
-    -test_set dg_cache/dataset/libssh2/data/test_merge_libssh2.jsonl \
-    -dictionary dg_cache/dataset/libssh2/dict_libssh2.jsonl \
+    -model lr \
     -repo_name libssh2 \
     -repo_path cloned \
     -repo_language C \
-    -dg_cache . \
-    -device cuda
+    -dg_save_folder .
