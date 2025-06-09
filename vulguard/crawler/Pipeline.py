@@ -18,22 +18,22 @@ def run(params):
     else:
         print(f"No lock file found at: {lock_file}")
         
-    # print("Miner!")
-    # print("=" * 20)
-    # miner = Miner(params)
-    # filtered_raw_commits = miner.run()
+    print("Miner!")
+    print("=" * 20)
+    miner = Miner(params)
+    filtered_raw_commits = miner.run()
     
     
-    # print("=" * 20)
-    # df = pd.read_json(f"{params.dataset_save_path}/commit_ids_{params.repo_name}.jsonl", orient="records", lines=True)
-    # filtered_raw_commits = list(df["commit_id"])
+    print("=" * 20)
+    df = pd.read_json(f"{params.dataset_save_path}/commit_ids_{params.repo_name}.jsonl", orient="records", lines=True)
+    filtered_raw_commits = list(df["commit_id"])
     
-    # print("Extractor!")
-    # print("=" * 20)
-    # extractor = Extractor(params)
-    # extractor.run(filtered_raw_commits)
+    print("Extractor!")
+    print("=" * 20)
+    extractor = Extractor(params)
+    extractor.run(filtered_raw_commits)
     
-    # print("=" * 20)
+    print("=" * 20)
     
     print("SZZ!")
     print("=" * 20)
@@ -61,5 +61,3 @@ def run(params):
     labeler.run()
     print("=" * 20)
 
-# if __name__ == "__main__":
-#     main()

@@ -1,7 +1,7 @@
-import pickle, json, torch, os
+import torch
 import numpy as np
 from torch.utils.data import Dataset, DataLoader
-from .padding import padding_data, padding_data_point
+from .padding import padding_data_point
 
 class CustomDataset(Dataset):
     def __init__(self, file_path, hyperparameters, code_dict, msg_dict):

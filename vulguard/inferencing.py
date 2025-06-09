@@ -1,4 +1,4 @@
-from . import *
+from .models.init_model import init_model
 from .utils.logger import logger
 from .utils.utils import SRC_PATH, sort_by_predict, create_dg_cache
 import os, json, time
@@ -22,8 +22,7 @@ def inferencing(params):
 
     threshold = params.threshold if params.threshold is not None else 0.5
     infer_df_path = params.infer_set
-    infer_df = pd.read_json(infer_df_path, orient="records", lines=True)
-    result_df = model.inference(infer_df=infer_df, threshold=threshold)
+    result_df = model.inference(infer_df=infer_df_path, threshold=threshold)
     end_whole_process = time.time()
 
     if not params.no_warning:

@@ -1,139 +1,65 @@
 from vulguard.models.BaseWraper import BaseWraper
-import pickle, json, torch, os
-from .model import DeepJITModel
-from vulguard.utils.utils import SRC_PATH, open_jsonl
-from sklearn.ensemble import RandomForestClassifier
+from vulguard.utils.utils import remove_file_from_path
+from .sim.warper import Sim
+from .com.warper import Com
+import pandas as pd
+import os
 
 class SimCom(BaseWraper):
-    def __init__(self, language='cpp', device="cpu"):
+    def __init__(self, language, device="cpu"):
         self.model_name = 'simcom'
         self.language = language
+        self.device = device
         self.initialized = False
-        self.com = None
-        self.sim = None
-        self.device = device
-        self.message_dictionary = None
-        self.code_dictionary = None
-        self.hyperparameters = None
-        # download_folder(self.model_name, self.language)
-
-    def __call__(self, message, code):
-        return self.com(message, code)
         
-    def get_parameters(self):
-        return self.com.parameters()
-    
-    def set_device(self, device):
-        self.device = device
-
-    def initialize(self, dictionary=None, hyperparameters=None, from_pretrain=None, state_dict=None, pretrain=None):
-        if self.initialized:
-            return
+        self.sim = Sim(self.language)
+        self.com = Com(self.language, self.device)
+        self.default_input = "Kamei_features"
         
-        # Create machine learning model
-        if pretrain:
-            self.sim = pickle.load(open(pretrain, "rb"))
-        else:
-            self.sim = RandomForestClassifier()
-            
-        # Load dictionary
-        if dictionary:
-            dictionary = open_jsonl(dictionary)
-        else:
-            dictionary = open_jsonl(f"{SRC_PATH}/models/metadata/{self.model_name}/{self.language}_dictionary.jsonl")
-        self.message_dictionary, self.code_dictionary = dictionary[0], dictionary[1]
-        del dictionary
-        print("Complete dict!")
-        
-        # Load parameters
-        if hyperparameters:
-            with open(hyperparameters, 'r') as file:
-                self.hyperparameters = json.load(file)
-        else:
-            with open(f"{SRC_PATH}/models/hyperparameters.json", 'r') as file:
-                self.hyperparameters = json.load(file)
-        print("Complete load params!")
-        
-        # Set up param
-        self.hyperparameters["filter_sizes"] = [int(k) for k in self.hyperparameters["filter_sizes"].split(',')]
-        self.hyperparameters["vocab_msg"], self.hyperparameters["vocab_code"] = len(self.message_dictionary), len(self.code_dictionary)
-        self.hyperparameters["class_num"] = 1
-        print("Complete set up params!")
-        
-        # Create model and Load pretrain
-        self.com = DeepJITModel(self.hyperparameters).to(device=self.device)
-        if from_pretrain and dictionary is None:
-            checkpoint = torch.load(f"{SRC_PATH}/models/metadata/{self.model_name}/com_{self.language}", map_location=self.device)
-            self.com.load_state_dict(checkpoint["model_state_dict"])
-        elif state_dict:
-            checkpoint = torch.load(state_dict, map_location=self.device)
-            self.com.load_state_dict(checkpoint["model_state_dict"])
-        print("Complete create model!")
-        # Set initialized to True
+    def initialize(self, dictionary, hyperparameters, model_path=None, **kwarg):
+        self.sim.initialize(model_path=model_path)
+        self.com.initialize(dictionary=dictionary, hyperparameters=hyperparameters, model_path=model_path)
         self.initialized = True
-
-    def preprocess(self, data):
+        
+    def preprocess(self):
         pass
 
-    def inference(self, model_input):
-        if not self.initialized:
-            self.initialize()
-
-        # Forward
-        self.com.eval()
-        with torch.no_grad():
-            # Extract data from DataLoader
-            code = torch.tensor(model_input["code"], device=self.device)
-            message = torch.tensor(model_input["message"], device=self.device)
-
-            # Forward
-            predict = self.model(message, code)
-
-        return predict
-
-    def postprocess(self, og_commit_hashes, commit_hashes, inference_output):
-        if not self.initialized:
-            self.initialize()
-
-        inference_output = inference_output.tolist()
-
-        result = []
-        for i in range(len(commit_hashes)):
-            if commit_hashes[i] == 'Not code change':
-                result.append({'commit_hash': og_commit_hashes[i], 'predict': -1})
-            else:
-                result.append({'commit_hash': commit_hashes[i], 'predict': inference_output[i]})
-
-        return result
-
-    def handle(self, data):
-        if not self.initialized:
-            self.initialize()
-            
-        model_output = self.inference(data)
-        final_prediction = self.postprocess(data['commit_hashes'], model_output)
-
-        return final_prediction
-
-    def save_sim(self, save_dir):
-        if not os.path.isdir(save_dir):
-            os.makedirs(save_dir)
+    def postprocess(self, sim_predict, com_predict, threshold):
+        final_predict = pd.merge(sim_predict, com_predict, on='commit_id', suffixes=('_1', '_2'))
+        final_predict['probability'] = (final_predict['probability_1'] + final_predict['probability_2']) / 2
+        final_predict['prediction'] = (final_predict['probability'] > threshold).astype(float)
         
-        save_path = f"{save_dir}/sim.pkl"
-        pickle.dump(self.sim, open(save_path, "wb"))
+        return final_predict[['commit_id', 'probability', 'prediction']]
 
-    def save(self, save_dir):
-        if not os.path.isdir(save_dir):
-            os.makedirs(save_dir)
+    def inference(self, infer_df, threshold, **kwarg):
+        infer_path = remove_file_from_path(infer_df)
+        params = kwarg.get("params")
         
-        save_path = f"{save_dir}/com.pt"
-        torch.save(self.com.state_dict(), save_path)
+        print("Infer Sim:")
+        sim_infer = f'{infer_path}/test_{self.sim.default_input}_{params.repo_name}.jsonl' 
+        sim_predict = self.sim.inference(infer_df=sim_infer, threshold=threshold, **kwarg)
+        
+        print("Infer Com:")
+        com_infer = f'{infer_path}/test_{self.com.default_input}_{params.repo_name}.jsonl' 
+        com_predict = self.com.inference(infer_df=com_infer, threshold=threshold, **kwarg)
+        final_predict = self.postprocess(sim_predict, com_predict, threshold)
+        return final_predict
 
-    def predict_proba(self, test):
-        if not self.initialized:
-            self.initialize()
-            
-        return self.sim.predict_proba(test)
-    
-    def load_state_dict(self, state_dict):
-        self.com.load_state_dict(state_dict)
+    def train(self, train_df, val_df, **kwarg):
+        train_path = remove_file_from_path(train_df)
+        val_path = remove_file_from_path(val_df)
+        params = kwarg.get("params")
+
+        print("Train Sim:")
+        sim_train = f'{train_path}/train_{self.sim.default_input}_{params.repo_name}.jsonl'
+        self.sim.train(sim_train, **kwarg)
+        
+        print("Train Com:")
+        com_train = f'{train_path}/train_{self.com.default_input}_{params.repo_name}.jsonl'
+        com_val = f'{val_path}/val_{self.com.default_input}_{params.repo_name}.jsonl'
+        self.com.train(com_train, com_val, **kwarg)
+
+    def save(self, save_path, **kwarg):
+        os.makedirs(save_path, exist_ok=True)        
+        self.sim.save(save_path=save_path)
+        self.com.save(save_path=save_path)

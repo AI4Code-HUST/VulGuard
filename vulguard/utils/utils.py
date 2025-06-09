@@ -31,3 +31,8 @@ def create_dg_cache(save_folder):
         if not os.path.exists(os.path.join(dg_cache_path, folder)):
             os.mkdir(os.path.join(dg_cache_path, folder))
     return dg_cache_path
+
+def remove_file_from_path(path):
+    normalized_path = os.path.normpath(path)
+    dir_path = normalized_path if os.path.isdir(normalized_path) else os.path.dirname(normalized_path)
+    return dir_path

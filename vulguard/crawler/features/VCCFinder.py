@@ -1,10 +1,9 @@
-import math, re, os, shutil
+import re, os, shutil
 import logging
 import traceback
-import numpy as np
 from typing import Dict, List, Tuple, Set
 from tqdm import tqdm
-from ..utils.utils import save_json, load_json, append_jsonl, load_jsonl
+from ..utils.utils import save_json, load_json, append_jsonl
 
 keywords_62 = [
     "do", "if", "asm", "for", "int", "new", "try", "auto", "bool", "case", "char", "else", "enum", "free", "goto", "long", 
@@ -163,20 +162,3 @@ def find_files(regex_pattern: str, folder: str) -> List[str]:
             if pattern.match(file):
                 matching_files.append(os.path.join(root, file))
     return matching_files
-
-# if __name__ == "__main__":
-#     path = r"E:\ALL_DATA\raw_data\FFmpeg"
-#     file_regex = r"^extracted-all-FFmpeg-start-\d+-end-\d+.jsonl$"
-    
-#     file_paths = find_files(file_regex, path)
-#     logger = create_console_log_handler("vcc")
-#     features_extractor = VCCFinder(logger)
-
-#     for file in tqdm(file_paths):
-#         with tqdm() as bar:
-#             for commit in load_jsonl(file):
-#                 features_extractor.absorb(commit)
-#                 bar.update(1)
-#         features_extractor.save_state("E:/NewCrawler/vcc")
-#     features_extractor.load_state("E:/NewCrawler/vcc")
-#     features_extractor.release("E:/NewCrawler/vcc/vcc-features-extracted-all-FFmpeg.jsonl")

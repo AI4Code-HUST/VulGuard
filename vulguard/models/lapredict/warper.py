@@ -1,7 +1,6 @@
 from vulguard.models.BaseWraper import BaseWraper
 from sklearn.linear_model import LogisticRegression as sk_LogisticRegression
 import pickle, os
-from vulguard.utils.utils import  SRC_PATH
 import pandas as pd
 
 class LAPredict(BaseWraper):
@@ -22,11 +21,15 @@ class LAPredict(BaseWraper):
 
         self.initialized = True
         
-    def preprocess(self, data, **kwarg):         
-        commit_ids = data.loc[:, "commit_id"]
-        features = data.loc[:, self.columns]
-        labels = data.loc[:, "label"] if "label" in data.columns else None
-
+    def preprocess(self, data_df):
+        print(f"Load data: {data_df}")
+        train_df = pd.read_json(data_df, orient="records", lines=True)         
+        
+        commit_ids = train_df.loc[:, "commit_id"]
+        features = train_df.loc[:, self.columns]
+        
+        assert "label" in train_df.columns, "Ensure there is label column in training data"
+        labels = train_df.loc[:, "label"] 
         return commit_ids, features, labels
     
     def postprocess(self, commit_ids, outputs, threshold, **kwarg):
@@ -48,13 +51,15 @@ class LAPredict(BaseWraper):
         
         return final_prediction
     
-    def train(self, train_df, **kwarg):
-        _ , data, label = self.preprocess(train_df)
-        self.model.fit(data, label)        
-    
-    def save(self, save_dir, **kwarg):
-        if not os.path.isdir(save_dir):       
-            os.makedirs(save_dir)
+    def train(self, **kwarg):
+        train_df = kwarg.get("train_df")
+        save_path = kwarg.get("save_path")
         
-        save_path = f"{save_dir}/la.pkl"
+        _ , data, label = self.preprocess(train_df)
+        self.model.fit(data, label)   
+        self.save(save_path)          
+    
+    def save(self, save_path, **kwarg):
+        os.makedirs(save_path, exist_ok=True)        
+        save_path = f"{save_path}/la.pkl"
         pickle.dump(self.model, open(save_path, "wb"))
