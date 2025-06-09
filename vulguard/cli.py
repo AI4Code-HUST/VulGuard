@@ -30,7 +30,7 @@ def main(args=None):
     modes = ["local", "remote"]
 
     common_parser = argparse.ArgumentParser(add_help=False)
-    common_parser.add_argument("-dg_cache", default=".", type=str, help="")
+    common_parser.add_argument("-dg_save_folder", default=".", type=str, help="")
     common_parser.add_argument("-mode", type=str, default="local", help="Mode of extractor", choices=modes)
     common_parser.add_argument("-repo_name", type=str, default=None, help="Repo name")
     common_parser.add_argument("-repo_path", type=str, default=None, help="Path to git repository")
