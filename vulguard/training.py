@@ -7,9 +7,18 @@ def training(params):
     save_path = f'{dg_cache_path}/save/{params.repo_name}'
     model = init_model(params.model, params.repo_language, params.device)
     
+    default_inputs = model.default_input.split(",")
+    if params.train_set:
+        train_df_path = params.train_set
+    else:
+        train_df_path = ','.join([f'{dg_cache_path}/dataset/{params.repo_name}/data/train_{default_input}_{params.repo_name}.jsonl' for default_input in default_inputs])
+    
+    if params.val_set:
+        val_df_path = params.val_set
+    else:
+        val_df_path = ','.join([f'{dg_cache_path}/dataset/{params.repo_name}/data/val_{default_input}_{params.repo_name}.jsonl' for default_input in default_inputs])
+        
     model_path = params.model_path
-    train_df_path = f'{dg_cache_path}/dataset/{params.repo_name}/data/train_{model.default_input}_{params.repo_name}.jsonl' if params.train_set is None else params.train_set
-    val_df_path = f'{dg_cache_path}/dataset/{params.repo_name}/data/val_{model.default_input}_{params.repo_name}.jsonl' if params.val_set is None else params.val_set
     dictionary = f'{dg_cache_path}/dataset/{params.repo_name}/dict_{params.repo_name}.jsonl'  if params.dictionary is None else params.dictionary 
     hyperparameters = f"{SRC_PATH}/models/{model.model_name}/hyperparameters.json" if params.hyperparameters is None else params.hyperparameters
     

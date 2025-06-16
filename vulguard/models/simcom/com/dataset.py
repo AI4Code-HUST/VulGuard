@@ -45,6 +45,3 @@ def load_dataset(data_df, hyperparameters, code_dict, msg_dict):
         labels = [None for i in range(len(commit_ids))]  
     
     return (commit_ids, codes, messages, labels)
-
-def get_data_loader(data, batch_size):
-    return DataLoader(data, batch_size)

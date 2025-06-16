@@ -2,11 +2,12 @@ from vulguard.models.BaseWraper import BaseWraper
 import json, torch, os
 import torch.nn as nn
 from .model import DeepJITModel
-from .dataset import CustomDataset, get_data_loader
 from vulguard.utils.utils import open_jsonl
 from tqdm import tqdm
 import pandas as pd
 from sklearn.metrics import roc_auc_score, precision_recall_curve, auc
+from .dataset import CustomDataset
+from torch.utils.data import DataLoader
 
 def get_auc(ground_truth, predict):
     roc_auc = roc_auc_score(y_true=ground_truth, y_score=predict)
@@ -63,39 +64,39 @@ class Com(BaseWraper):
             self.model = DeepJITModel(self.hyperparameters).to(device=self.device)
             self.optimizer = torch.optim.Adam(self.get_parameters())
             
-            if model_path is not None:
-                checkpoint = torch.load(f"{model_path}/com.pth")  # Load the last saved checkpoint
-                self.model.load_state_dict(checkpoint['model_state_dict'])
-                self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-                self.start_epoch = checkpoint['epoch'] + 1
-                self.total_loss = checkpoint['loss']
+            checkpoint = torch.load(f"{model_path}/com.pth")  # Load the last saved checkpoint
+            self.model.load_state_dict(checkpoint['model_state_dict'])
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            self.start_epoch = checkpoint['epoch'] + 1
+            self.total_loss = checkpoint['loss']
 
         # Set initialized to True
         self.initialized = True
 
     def preprocess(self, data_df, **kwarg):  
         print(f"Load data: {data_df}")
-        data = pd.read_json(data_df, orient="records", lines=True)         
+        data = pd.read_json(data_df, orient="records", lines=True)   
+        labels = data.loc[:, "label"] if "label" in data.columns else None      
                   
         data = CustomDataset(data, self.hyperparameters, self.code_dictionary, self.message_dictionary)
-        data_loader = get_data_loader(data, self.hyperparameters["batch_size"])
-        return data_loader
+        data_loader = DataLoader(data, self.hyperparameters["batch_size"])
+        return data_loader, labels
     
         
-    def postprocess(self, commit_ids, outputs, threshold, **kwarg):
-        result = []
-        for commit_id, output in zip(commit_ids, outputs):
-            json_obj = {
-                'commit_id': commit_id, 
-                'probability': output, 
-                'prediction': float(output > threshold)
-            }
-            result.append(json_obj)
-        result = pd.DataFrame(result)
+    def postprocess(self, commit_ids, outputs, threshold, labels=None, **kwargs):
+        result = pd.DataFrame({
+            "commit_id": commit_ids,
+            "probability": outputs,
+        })
+        result["prediction"] = (result["probability"] > threshold).astype(float)
+        
+        if labels is not None:
+            result["label"] = labels
+
         return result
 
     def inference(self, infer_df, threshold, **kwarg):       
-        data_loader = self.preprocess(infer_df) if self.val_loader is None else self.val_loader
+        data_loader, labels = self.preprocess(infer_df) if self.val_loader is None else (self.val_loader, None)
         
         self.model.eval()
         with torch.no_grad():
@@ -113,47 +114,45 @@ class Com(BaseWraper):
                 # Free GPU memory
                 torch.cuda.empty_cache()
         
-        final_prediction = self.postprocess(commit_ids, predicts, threshold)
+        final_prediction = self.postprocess(commit_ids, predicts, threshold, labels)
 
         return final_prediction
     
     def train(self, train_df, val_df, **kwarg):
         params = kwarg.get("params")
         save_path = kwarg.get("save_path")   
-        threshold = 0.5 if params.threshold is None else params.threshold     
-        self.optimizer = torch.optim.Adam(self.get_parameters(), lr=params.learning_rate) if self.optimizer is None else self.optimizer
+        threshold = 0.5 if params.threshold is None else params.threshold  
         criterion = nn.BCELoss()
+        if self.optimizer is None:   
+            self.optimizer = torch.optim.Adam(self.get_parameters(), lr=self.hyperparameters["learning_rate"]) 
         
-        data_loader = self.preprocess(train_df)
+        data_loader, train_labels = self.preprocess(train_df)
+        assert train_labels is not None, "Ensure there is label column in training data"
+        
+        self.val_loader, val_ground_truth = self.preprocess(val_df)
+        assert val_ground_truth is not None, "Ensure there is label column in validation data"
+
         
         best_valid_score = 0
         early_stop_count = 5
-        
-        self.val_loader = self.preprocess(val_df)
-
-        df = pd.read_json(val_df, orient="records", lines=True)
-        assert "label" in df.columns, "Ensure there is label column in training data"
-        val_ground_truth = df.loc[:, "label"]
-        
-        
-        for epoch in range(self.start_epoch, params.epochs + 1):
-            self.last_epoch = epoch
-            print(f'Training: Epoch {epoch} / {params.epochs} -- Start')
+        self.last_epoch = self.hyperparameters["epoch"] if params.epochs is None else params.epochs
+        for epoch in range(self.start_epoch, self.last_epoch + 1):
+            print(f'Training: Epoch {epoch} / {self.last_epoch} -- Start')
             for batch in tqdm(data_loader):
                 # Extract data from DataLoader
                 code = batch["code"].to(self.device)
                 message = batch["message"].to(self.device)
-                labels = batch["label"].to(self.device)
+                label = batch["label"].to(self.device)
 
                 self.optimizer.zero_grad()
                 predict = self.model(message, code)
 
-                loss = criterion(predict, labels)
+                loss = criterion(predict, label)
                 loss.backward()
                 self.total_loss = loss.item()
                 self.optimizer.step()
 
-            print(f'Training: Epoch {epoch} / {params.epochs} -- Total loss: {self.total_loss}')
+            print(f'Training: Epoch {epoch} / {self.last_epoch} -- Total loss: {self.total_loss}')
 
             prediction = self.inference(val_df, threshold)
             val_predict = prediction.loc[:, "probability"]
@@ -179,12 +178,12 @@ class Com(BaseWraper):
                     break
             
     
-    def save(self, save_path, **kwarg):
+    def save(self, save_path, epoch=None, **kwarg):
         os.makedirs(save_path, exist_ok=True)
         
         save_path = f"{save_path}/com.pth"
         torch.save({
-            'epoch': self.last_epoch,
+            'epoch': self.last_epoch if epoch is None else epoch,
             'model_state_dict': self.model.state_dict(),
             'optimizer_state_dict': self.optimizer.state_dict(),
             'loss': self.total_loss,

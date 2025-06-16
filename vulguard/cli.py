@@ -7,6 +7,7 @@ from .inferencing import inferencing
 from .mining import mining
 from .training import training
 from .evaluating import evaluating
+from .models.init_model import models
 
 __version__ = "0.2.01"
 
@@ -19,14 +20,13 @@ def seed_torch(seed=42):
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
 
-seed_torch()
+
 
 def main(args=None):
     if args is None:
         args = sys.argv[1:]
 
     available_languages = ["Python", "Java", "C++", "C", "C#", "JavaScript", "TypeScript", "Ruby", "PHP", "Go", "Swift"]
-    models = ["deepjit", "simcom", "lapredict", "tlel", "lr"]
     modes = ["local", "remote"]
 
     common_parser = argparse.ArgumentParser(add_help=False)
@@ -50,7 +50,7 @@ def main(args=None):
     inferencing_parser.set_defaults(func=inferencing)
     inferencing_parser.add_argument("-model", type=str, default=None, choices=models, help="List of models")
     inferencing_parser.add_argument("-device", type=str, default="cpu", help="Eg: cpu, cuda, cuda:1")
-    inferencing_parser.add_argument("-threshold", type=float, default=0.5, help="Threshold for warning")
+    inferencing_parser.add_argument("-threshold", type=float, default=None, help="Threshold for warning")
     inferencing_parser.add_argument("-no_warning", action="store_true", help="Supress output warning")
     inferencing_parser.add_argument("-infer_set", type=str, default=None, help="")
     inferencing_parser.add_argument("-ranking", action="store_true", help="Ranking mode")
@@ -62,26 +62,27 @@ def main(args=None):
     training_parser = argparse.ArgumentParser(parents=[common_parser], add_help=False)
     training_parser.set_defaults(func=training)
     training_parser.add_argument("-model", type=str, default=None, choices=models, help="List of models")
+    training_parser.add_argument("-device", type=str, default="cpu", help="Eg: cpu, cuda, cuda:1")
+    training_parser.add_argument("-threshold", type=float, default=None, help="Threshold for warning")
     training_parser.add_argument("-epochs",type=int,default=1, help="")
-    training_parser.add_argument("-dictionary",type=str,default=None, help="")
-    training_parser.add_argument("-hyperparameters",type=str,default=None, help="")
-    training_parser.add_argument("-threshold", type=float, default=0.5, help="Threshold for warning")
     training_parser.add_argument("-model_path", type=str, default=None, help="Path to pretrain models")
     training_parser.add_argument("-train_set", type=str, default=None, help="")
     training_parser.add_argument("-val_set", type=str, default=None, help="")
-    training_parser.add_argument("-learning_rate", type=float, default=5e-5, help="")
-    training_parser.add_argument("-device", type=str, default="cpu", help="Eg: cpu, cuda, cuda:1")
+    training_parser.add_argument("-dictionary",type=str,default=None, help="")
+    training_parser.add_argument("-hyperparameters",type=str,default=None, help="")
+    
 
     evaluating_parser = argparse.ArgumentParser(parents=[common_parser], add_help=False)
     evaluating_parser.set_defaults(func=evaluating)
     evaluating_parser.add_argument("-model", type=str, default=None, choices=models, help="List of models")
+    evaluating_parser.add_argument("-device", type=str, default="cpu", help="Eg: cpu, cuda, cuda:1")
+    evaluating_parser.add_argument("-threshold", type=float, default=None, help="Threshold for warning")
     evaluating_parser.add_argument("-model_path", type=str, default=None, help="Path to pretrain models")
+    evaluating_parser.add_argument("-test_set", type=str, default=None, help="")
+    evaluating_parser.add_argument("-size_set", type=str, default=None, help="File include number of added line and deleted line of each commit to get effort metrics.")
     evaluating_parser.add_argument("-dictionary",type=str,default=None, help="")
     evaluating_parser.add_argument("-hyperparameters",type=str,default=None, help="")
-    evaluating_parser.add_argument("-threshold", type=float, default=0.5, help="Threshold for warning")
-    evaluating_parser.add_argument("-test_set", type=str, default=None, help="")
-    evaluating_parser.add_argument("-size_file", type=str, default=None, help="File include number of added line and deleted line of each commit to get effort metrics.")
-    evaluating_parser.add_argument("-device", type=str, default="cpu", help="Eg: cpu, cuda, cuda:1")
+    
 
     parser = argparse.ArgumentParser(prog="VulGuard", description="A tool for mining, training, evaluating for Just-in-Time Vulnerability Prediction")
     parser.add_argument("-version", action="version", version="%(prog)s " + __version__)
@@ -115,6 +116,11 @@ def main(args=None):
     if not hasattr(options, 'func'):
         parser.print_help()
         exit(1)
+    
+    if options.__dict__.get('command') in ['training', 'evaluating', 'inferencing']:
+        print("Set seed!")
+        seed_torch()
+        
     options.func(options)
 
 if __name__ == "__main__":

@@ -29,7 +29,7 @@ def eval_metrics(result_df, model, columns):
 
     # find Effort metrics
     
-    result_df['defect_density'] = result_df['proba'] / result_df['LOC']  # predicted defect density
+    result_df['defect_density'] = result_df['probability'] / result_df['LOC']  # predicted defect density
     result_df['actual_defect_density'] = result_df['label'] / result_df['LOC']  # defect density
 
     result_df = result_df.sort_values(by='defect_density', ascending=False)
@@ -97,9 +97,12 @@ def get_metrics(predict_df, model, features_file=None):
     
     if features_file is not None:
         features_df = pd.read_json(features_file, lines=True)
-        LOC_df = features_df[["commit_id", "la", "ld"]]
+        assert all(col in features_df.columns for col in ["la", "ld"]), "Provide add lines (la), and delete lines (ld) in size set"
+        
+        LOC_df = features_df[["commit_id", "la", "ld"]].copy()
         LOC_df["LOC"] = LOC_df["la"] + LOC_df["ld"]
         LOC_df = LOC_df[["commit_id", "LOC"]]
+
         
         predict_df = pd.merge(predict_df, LOC_df, how="inner", on="commit_id")
         

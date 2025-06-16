@@ -29,31 +29,29 @@ class LogisticRegression(BaseWraper):
         
     def preprocess(self, data_df):
         print(f"Load data: {data_df}")
-        train_df = pd.read_json(data_df, orient="records", lines=True)         
+        data = pd.read_json(data_df, orient="records", lines=True)         
         
-        commit_ids = train_df.loc[:, "commit_id"]
-        features = train_df.loc[:, self.columns]
-        
-        assert "label" in train_df.columns, "Ensure there is label column in training data"
-        labels = train_df.loc[:, "label"] 
+        commit_ids = data.loc[:, "commit_id"]
+        features = data.loc[:, self.columns]
+        labels = data.loc[:, "label"] if "label" in data.columns else None
         return commit_ids, features, labels
     
-    def postprocess(self, commit_ids, outputs, threshold):
-        result = []
-        for commit_id, output in zip(commit_ids, outputs):
-            json_obj = {
-                'commit_id': commit_id, 
-                'probability': output, 
-                'prediction': float(output > threshold)
-            }
-            result.append(json_obj)
-        result = pd.DataFrame(result)
+    def postprocess(self, commit_ids, outputs, threshold, labels=None, **kwargs):
+        result = pd.DataFrame({
+            "commit_id": commit_ids,
+            "probability": outputs,
+        })
+        result["prediction"] = (result["probability"] > threshold).astype(float)
+        
+        if labels is not None:
+            result["label"] = labels
+
         return result
     
     def inference(self, infer_df, threshold, **kwarg):        
-        commit_ids, features, _ = self.preprocess(infer_df)
+        commit_ids, features, labels = self.preprocess(infer_df)
         outputs = self.model.predict_proba(features)[:, 1]
-        final_prediction = self.postprocess(commit_ids, outputs, threshold)
+        final_prediction = self.postprocess(commit_ids, outputs, threshold, labels)
         
         return final_prediction
     
@@ -62,6 +60,8 @@ class LogisticRegression(BaseWraper):
         save_path = kwarg.get("save_path")
         
         _ , data, label = self.preprocess(train_df)
+        assert label is not None, "Ensure there is label column in training data"
+        
         self.model.fit(data, label)   
         self.save(save_path)     
     

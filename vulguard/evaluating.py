@@ -3,6 +3,7 @@ from .models.init_model import init_model
 from .utils.utils import SRC_PATH, create_dg_cache
 from .utils.metrics import get_metrics
 import pandas as pd
+import numpy as np
           
 def evaluating(params):
     dg_cache_path = create_dg_cache(params.dg_save_folder)
@@ -19,17 +20,26 @@ def evaluating(params):
     print(f"Init model: {model.model_name}")
     model.initialize(model_path=model_path, dictionary=dictionary, hyperparameters=hyperparameters)
     
-    threshold = 0.5 if params.threshold is None else params.threshold  
-    test_df_path = f'{dg_cache_path}/dataset/{params.repo_name}/data/test_{model.default_input}_{params.repo_name}.jsonl' if params.test_set is None else params.test_set
-    test_df = pd.read_json(test_df_path, orient="records", lines=True)
-    label_df = test_df[["commit_id", "label"]]
+    threshold = 0.5 if params.threshold is None else params.threshold 
+    default_inputs = model.default_input.split(",")
+    if params.test_set:
+        test_df_path = params.test_set
+    else:
+        test_df_path = ','.join([f'{dg_cache_path}/dataset/{params.repo_name}/data/test_{default_input}_{params.repo_name}.jsonl' for default_input in default_inputs]) 
     
     result_df = model.inference(infer_df=test_df_path, threshold=threshold, params=params)
-    result_df = result_df.merge(label_df, on="commit_id", how="inner")
     result_df.to_csv(f'{predict_score_path}/{model.model_name}.csv', index=False, columns=["commit_id", "label", "prediction", "probability"])
     print(f"Predict scores saved to: {predict_score_path}/{model.model_name}.csv")
     
-    size_file = params.size_file if params.size_file is not None else None
-    metrics_df = get_metrics(result_df, model.model_name, size_file)    
+    size_df_path = f'{dg_cache_path}/dataset/{params.repo_name}/data/test_Kamei_features_{params.repo_name}.jsonl' if params.size_set is None else params.size_set
+    size_df = pd.read_json(size_df_path, orient="records", lines=True)
+    if not (
+        'commit_id' in size_df.columns and
+        'commit_id' in result_df.columns and
+        np.array_equal(size_df["commit_id"].values, result_df["commit_id"].values)
+    ):
+        size_df_path = None
+    
+    metrics_df = get_metrics(result_df, model.model_name, size_df_path)    
     metrics_df.to_csv(f'{result_path}/{model.model_name}.csv', index=True)
     print(f"Metrics saved to: {result_path}/{model.model_name}.csv")
