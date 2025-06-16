@@ -1,0 +1,33 @@
+{
+  "model_name_or_path": "microsoft/codebert-base",
+  "config_name": "microsoft/codebert-base",
+  "tokenizer_name": "microsoft/codebert-base",
+  "max_seq_length": 512,
+  "gradient_accumulation_steps": 1,
+  "weight_decay": 0.0,
+  "adam_epsilon": 1e-8,
+  "max_grad_norm": 1.0,
+  "max_steps": -1,
+  "warmup_steps": 0,
+  "epochs": 50,
+  "feature_size": 14,
+  "num_labels": 2,
+  "max_msg_length": 64,
+  "head_dropout_prob": 0.1,
+  "hidden_dropout_prob": 0.1,
+  "no_abstraction": false,
+  
+  "train" : {
+    "train_batch_size": 24,
+    "eval_batch_size": 128,
+    "learning_rate": 1e-5,
+    "patience": 10
+  },
+
+  "test": {
+    "train_batch_size": 256,
+    "eval_batch_size": 25,
+    "learning_rate": 2e-5,
+    "patience": 5
+  }
+}

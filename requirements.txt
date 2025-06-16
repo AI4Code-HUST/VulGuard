@@ -22,3 +22,4 @@ regex==2022.1.18
 python-Levenshtein==0.12.2
 matplotlib==3.6.3
 tqdm==4.67.1
+transformers==4.16.2
