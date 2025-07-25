@@ -1,11 +1,12 @@
 from .utils.utils import create_dg_cache
 from .utils.logger import logger
 from .crawler import Pipeline
+from .crawler.graph_builder.pipeline import pipeline
 from argparse import Namespace
 
 def mining(params):
-    logger("Start VulGuard")
-    print("Start VulGuard")
+    logger("Start Mining!")
+    print("Start Mining!")
     dg_cache_path = create_dg_cache(params.dg_save_folder)
     
     # User's input handling
@@ -25,8 +26,17 @@ def mining(params):
         "start": params.start,
         "end": params.end,
         "logger": logger,
-        "vfc_file": params.vfc_file
+        "vfc_file": params.vfc_file,
+        "lab": params.lab
     }
 
     cfg = Namespace(**cfg)    
     Pipeline.run(cfg)
+
+def graph_builder(params):
+    logger("Start Build!")
+    print("Start Build!")
+    dg_cache_path = create_dg_cache(params.dg_save_folder)
+    repo_dir = f"{params.repo_path}/{params.repo_name}"
+    
+    pipeline(repo_dir, params.input, params.output)

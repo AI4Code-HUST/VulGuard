@@ -53,7 +53,6 @@ class TLELModel(BaseWraper):
     def train(self, **kwarg):
         train_df = kwarg.get("train_df")
         save_path = kwarg.get("save_path")
-        
         _ , data, label = self.preprocess(train_df)
         assert label is not None, "Ensure there is label column in training data"
         self.model.fit(data, label)        

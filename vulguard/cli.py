@@ -4,7 +4,7 @@ from .utils.utils import SRC_PATH
 from datetime import datetime
 import numpy as np
 from .inferencing import inferencing
-from .mining import mining
+from .mining import mining, graph_builder
 from .training import training
 from .evaluating import evaluating
 from .models.init_model import models
@@ -45,6 +45,11 @@ def main(args=None):
     mining_parser.add_argument("-start", type=int, default=None, help="First commit index")
     mining_parser.add_argument("-end", type=int, default=None, help="Last commit index")
     mining_parser.add_argument("-vfc_file", type=int, default=None, help="VFC file")
+    mining_parser.add_argument("-lab",action="store_true", help="Lab label using only vic and vfc")
+    
+    graph_parser = argparse.ArgumentParser(parents=[common_parser], add_help=False)
+    graph_parser.set_defaults(func=graph_builder)
+    graph_parser.add_argument("-input", type=str, default=None, help="input commit file")
 
     inferencing_parser = argparse.ArgumentParser(parents=[common_parser], add_help=False)
     inferencing_parser.set_defaults(func=inferencing)
@@ -93,6 +98,7 @@ def main(args=None):
     subparsers.add_parser('inferencing', parents=[inferencing_parser], help='Inferencing Function')
     subparsers.add_parser('training', parents=[training_parser], help='Training Function')
     subparsers.add_parser('evaluating', parents=[evaluating_parser], help='Evaluating Function')
+    subparsers.add_parser('graph', parents=[graph_parser], help='Graph Buider Function')
 
     options = parser.parse_args(args)
 
