@@ -1,116 +1,47 @@
 # VulGuard
 
-This is the repository of VulGuard, An Unified Tool for Evaluating Just-In-Time Vulnerability Prediction Models.
+This is the repository of VulGuard, An Unified Tool for Evaluating Just-In-Time Vulnerability Prediction Models. This repository includes artifacts for reuse and reproduction of experimental results presented in our ICSME'25 paper titled _"Toward Realistic Evaluations of Just-In-Time Vulnerability Prediction"_. 
 
-## Installation
 
-## via Docker (RECOMMENDED)
+**Documentations**
+  * [Installation](docs/INSTALL.md)
+  * [Architecture](docs/ARCHITECTURE.md)
+    + [Project structure](docs/ARCHITECTURE.md#project-structure)
+    + [Component description](docs/ARCHITECTURE.md#component-descriptions)
+    + [Extending Vulguard](docs/ARCHITECTURE.md#extending-vulguard)
+  * [How-to-use](docs/USAGE.md)
+    + [Data format](docs/USAGE.md#input-output-format)
+    + [Basic usage](docs/USAGE.md#Basic-usage-example)
+  * [Reproducibility](#reproducibility)
+    + [Reproduce RQ1 - Ideal Setting Performance](reproduce/rq1_ideal_setting.ipynb)
+    + [Reproduce RQ2 - Realistic Setting Performance](reproduce/rq2_realistic_setting.ipynb)
+    + [Reproduce RQ3 - Imbalance Mitigating Techniques Effectiveness](reproduce/rq3_imbalance.ipynb)
+  * [Citation](#citation)
+  * [Contact](#contact)
+
+
+## Citation
 ```
-docker compose up --build -d
-docker exec -it vulguard /bin/bash
-```
-
-Inside docker container:
-
-```
-python setup.py develop
-```
-
-### If you want Docker container to access GPU(s), please download `nvidia-container-toolkit`
-
-**Note**: download this outside of the container
-
-Install the `nvidia-container-toolkit` package as per official documentation at Github.
-
-We also provide [a quick-run script](scripts/setup_nvidia_container_toolkit.sh) for Debian-based OS
-
-### From scratch
-
-- SrcML
-```
-# Install libarchive13 libcurl4 libxml2
-sudo apt-get install libarchive13 libcurl4 libxml2
-
-# Install libssl
-RUN wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
-    dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb && \
-    rm -rf libssl1.1_1.1.1f-1ubuntu2_amd64.deb
-
-# Install SrcML
-RUN wget http://131.123.42.38/lmcrs/v1.0.0/srcml_1.0.0-1_ubuntu20.04.deb && \
-    dpkg -i srcml_1.0.0-1_ubuntu20.04.deb && \
-    rm -rf srcml_1.0.0-1_ubuntu20.04.deb
+@inproceedings{nguyen2025toward,
+    author = {Nguyen, Duong and Le-Cong, Thanh and Huynh Minh Le, Triet and Babar, M. Ali and Huynh, Quyet-Thang},
+    title = {Toward Realistic Evaluations of Just-In-Time Vulnerability Prediction},
+    year = {2025},
+    publisher = {IEEE},
+    booktitle={the 41st International Conference on Software Maintenance and Evolution},
+}
 ```
 
-- Dependencies
 ```
-pip install -r requirements.txt
-```
-
-- Setup VulGuard
-```
-python setup.py develop
-```
-
-## Usages
-
-### Mining commits from Git repositories
-
-```
-vulguard mining \
-    -repo_name <project_name> \
-    -repo_path <path/to/project> \
-    -mode <local or remote> \
-    -repo_language <main_language_of_project> \
-    -szz <szz_algorithm_name> \
-    -workers <number_of_parallel_miners>
+@inproceedings{nguyen2025toward,
+    author = {Nguyen, Duong and Tran-Duc, Manh and Le-Cong, Thanh and Huynh Minh Le, Triet and Babar, M. Ali and Huynh, Quyet-Thang},
+    title = {VulGuard, An Unified Tool for Evaluating Just-In-Time Vulnerability Prediction Models},
+    year = {2025},
+    publisher = {IEEE},
+    booktitle={the 41st International Conference on Software Maintenance and Evolution},
+}
 ```
 
-[Example](scripts/test_mining.sh)
 
-### Training
+## Contact
 
-```
-vulguard training  \
-    -model <model_name> \
-    -train_set <path/to//train/set> \
-    -val_set <path/to/val/set> \
-    -dictionary <path/to/dictionary> \
-    -dg_save_folder <path/to/save/folder> \
-    -repo_name <project_name> \
-    -repo_language <main_language_of_project> \
-    -device cuda \
-    -epoch <number_of_epochs>
-```
-
-[Example](scripts/test_train.sh)
-
-### Evaluating
-
-```
-vulguard evaluating  \
-    -model <model_name> \
-    -test_set <path/to/test/set> \
-    -dictionary <path/to/dictionary> \
-    -dg_save_folder <path/to/save/folder> \
-    -repo_name <project_name> \
-    -repo_language <main_language_of_project> \
-    -device cuda 
-```
-
-[Example](scripts/test_evaluate.sh)
-
-
-### Inferencing
-
-```
-vulguard inferencing  \
-    -model <model_name> \
-    -model_path <path/to/trained/model> \
-    -infer_set <path/to/infer/set> \
-    -dictionary <path/to/dictionary> \
-    -dg_save_folder <path/to/save/folder> \
-    -device cuda 
-```
-
-[Example](scripts/test_infer.sh)
+[duong.nd215336@sis.hust.edu.vn](mailto:duong.nd215336@sis.hust.edu.vn?subject=[Vulguard])
