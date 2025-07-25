@@ -1,0 +1,11 @@
+services:
+  vulguard-cpu:
+    container_name: vulguard-cpu
+    image: vulguard-cpu:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
