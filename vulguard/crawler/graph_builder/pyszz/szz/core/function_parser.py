@@ -2,9 +2,9 @@ import logging as log
 import re
 from collections import namedtuple
 
-from config import C_FILE_EXTENSIONS, SOURCE_CODE_OUTPUTS_DIR
-from file_manager import get_file_name_with_parent, write_file, join_path, is_path_exist
-from helpers import subprocess_cmd
+from vulguard.crawler.graph_builder.config import C_FILE_EXTENSIONS, SOURCE_CODE_OUTPUTS_DIR
+from vulguard.crawler.graph_builder.file_manager import get_file_name_with_parent, write_file, join_path, is_path_exist
+from vulguard.crawler.graph_builder.helpers import subprocess_cmd
 
 CommentRange = namedtuple('CommentRange', 'start end')
 # srcml_file_ext = ['.c', '.h', '.hh', '.hpp', '.hxx', '.cxx', '.cpp', '.cc', '.cs', '.java']

@@ -1,7 +1,7 @@
 import pathlib
 import sys
 
-from file_manager import join_path, mkdir_if_not_exist
+from .file_manager import join_path, mkdir_if_not_exist
 
 BASE_DIR = str(pathlib.Path(__file__).parent.absolute()) + "/"
 

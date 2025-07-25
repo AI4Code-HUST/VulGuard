@@ -4,18 +4,18 @@ import logging
 import os
 import yaml
 from typing import Dict
-from .szz.ag_szz import AGSZZ
-from .szz.aszz.a_szz import ASZZ
-from .szz.b_szz import BaseSZZ
-from .szz.util.check_requirements import check_requirements
-from .szz.dfszz.df_szz import DFSZZ
-from .szz.l_szz import LSZZ
-from .szz.ma_szz import MASZZ, DetectLineMoved
-from .szz.r_szz import RSZZ
-from .szz.ra_szz import RASZZ
-from .szz.pd_szz import PyDrillerSZZ
-from .szz.vszz.v_szz import VSZZ
-from .szz.common.issue_date import parse_issue_date
+from vulguard.crawler.szz.szz.ag_szz import AGSZZ
+from vulguard.crawler.szz.szz.aszz.a_szz import ASZZ
+from vulguard.crawler.szz.szz.b_szz import BaseSZZ
+from vulguard.crawler.szz.szz.util.check_requirements import check_requirements
+from vulguard.crawler.szz.szz.dfszz.df_szz import DFSZZ
+from vulguard.crawler.szz.szz.l_szz import LSZZ
+from vulguard.crawler.szz.szz.ma_szz import MASZZ, DetectLineMoved
+from vulguard.crawler.szz.szz.r_szz import RSZZ
+from vulguard.crawler.szz.szz.ra_szz import RASZZ
+from vulguard.crawler.szz.szz.pd_szz import PyDrillerSZZ
+from vulguard.crawler.szz.szz.vszz.v_szz import VSZZ
+from vulguard.crawler.szz.szz.common.issue_date import parse_issue_date
 import concurrent.futures as cf
 from traceback import format_exc
 
@@ -169,10 +169,24 @@ def run(args):
             results.append(future.result())
 
         # print(results)
-        save_file = f"{args.save_path}/vic_{args.conf}_{args.repo_name}.jsonl"
+        save_file = f"{args.save_path}/{args.conf}_{args.repo_name}.jsonl"
         with open(save_file, "w") as f:
             for line in results:
                 f.write(json.dumps(line) + "\n")
+                
+        vic_file = f"{args.save_path}/vic_{args.repo_name}.jsonl"
+        vic = set()
+        for line in results:
+            vic.update(line["VIC"])
+        vic = list(vic)
+        
+        with open(vic_file, "w") as f:
+            for commit in vic:
+                line = {
+                    "commit_id": commit,
+                    "Repository": args.repo_name
+                }
+                f.write(json.dumps(line) + "\n")        
     except:
         log.error(format_exc())    
 

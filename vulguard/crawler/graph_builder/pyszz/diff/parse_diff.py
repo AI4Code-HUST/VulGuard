@@ -6,7 +6,7 @@ from collections import defaultdict
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
-from helpers import get_logger
+from vulguard.crawler.graph_builder.helpers import get_logger
 
 from .get_diff import get_diff_file, get_lines_change
 

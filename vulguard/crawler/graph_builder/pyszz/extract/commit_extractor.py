@@ -1,7 +1,7 @@
-from pydriller import Repository
+from pydriller import RepositoryMining
 
-from config import C_FILE_EXTENSIONS, MAX_CHANGE
-from helpers import get_logger
+from vulguard.crawler.graph_builder.config import C_FILE_EXTENSIONS, MAX_CHANGE
+from vulguard.crawler.graph_builder.helpers import get_logger
 from .modifier_extractor import ModifierExtractor
 
 logger = get_logger(__name__)
@@ -12,7 +12,7 @@ class CommitExtractor():
         self.commit_id = commit_id
 
         logger.info(f"extract commit: {self.commit_id}")
-        self._pydriller_repo = Repository(self._repository_dir, single=self.commit_id)
+        self._pydriller_repo = RepositoryMining(self._repository_dir, single=self.commit_id)
         self.commit = next(self._pydriller_repo.traverse_commits())
         self.modifies = list()
         # if len(self.commit.modified_files) >= MAX_CHANGE:

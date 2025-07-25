@@ -139,12 +139,6 @@ class Kamei14:
         m = STRONG_VUL.search(file_message)
         n = MEDIUM_VUL.search(file_message)
         return 1 if m or n else 0 
-        # bug_keywords = ["fix", "bug", "issue"]
-        # wrong_keywords = ["fix typo", "fix build", "non-fix"]
-        # if any(keyword in file_message for keyword in bug_keywords):
-        #     if not any(keyword in file_message for keyword in wrong_keywords):
-        #         return 1
-        # return 0
     
     def file_features (self, file_names: List[str]) -> Tuple[int, int, int]:
         ndev, nuc, ages = set(), 0, []

@@ -1,12 +1,12 @@
 import json
 from collections import defaultdict
 
-from pyszz.diff.parse_diff import parse_diff
+from vulguard.crawler.graph_builder.pyszz.diff.parse_diff import parse_diff
 
-from config import JOERN_PARSED_FUNCTIONS_OUTPUTS_DIR
-from file_manager import is_path_exist, join_path
-from helpers import get_logger
-from pyszz.ctg.utils import (format_node, get_parent_edges, format_edge,
+from vulguard.crawler.graph_builder.config import JOERN_PARSED_FUNCTIONS_OUTPUTS_DIR
+from vulguard.crawler.graph_builder.file_manager import is_path_exist, join_path
+from vulguard.crawler.graph_builder.helpers import get_logger
+from vulguard.crawler.graph_builder.pyszz.ctg.utils import (format_node, get_parent_edges, format_edge,
                              plot_graph, pre_compare)
 
 logger = get_logger(__name__)

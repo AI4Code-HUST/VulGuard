@@ -54,7 +54,7 @@ def run(params):
     label_cfg = {
         "repo_name": params.repo_name,
         "save_path": params.dataset_save_path,
-        "szz": params.szz,
+        "lab": params.lab,
     }
     label_cfg = argparse.Namespace(**label_cfg)
     labeler = Labeler(label_cfg)

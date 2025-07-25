@@ -216,22 +216,3 @@ class Miner:
                 "date": int(commit_date),
                 "keep": 1
             }
-    
-
-        
-       
-# # Example usage
-# if __name__ == "__main__":
-#     import argparse
-#     parser = argparse.ArgumentParser(add_help= False)
-#     parser.add_argument("--workers", type= int, default= 1, help="Number of parallel workers")
-#     parser.add_argument("--language", type= str, help="Language")
-#     parser.add_argument("--url", type=str, help= "Git clone url")
-#     parser.add_argument("--input_path", type=str, help= "Parent directory of input repository", default= DEFAULT_INPUT)
-#     parser.add_argument("--output_path", type=str, help= "Output directory", default= DEFAULT_OUTPUT)
-#     parser.add_argument("--start", type=int, default=None, help= "First commit index")
-#     parser.add_argument("--end", type=int, default=None, help="Last commit index")
-
-#     params = parser.parse_args()
-#     miner = Miner(params)
-#     miner.run()

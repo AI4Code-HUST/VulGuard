@@ -8,36 +8,44 @@ class Labeler:
     def __init__(self, params):
         self.repo_name = params.repo_name
         self.save_path = params.save_path
-        self.szz = params.szz if params.szz is not None else None
-        
-        self.label_file = f"{self.save_path}/vic_{self.szz}_{self.repo_name}.jsonl"
+        self.lab = params.lab
+        self.vic_file = f"{self.save_path}/vic_{self.repo_name}.jsonl"
+        self.vfc_file = f"{self.save_path}/vfc_{self.repo_name}.jsonl"
         self.commit_list = f"{self.save_path}/commit_ids_{self.repo_name}.jsonl"
         
     def run(self):
-        data = self.link_label()
+        all_commits = pd.read_json(self.commit_list, orient="records", lines=True)
+        
+        VIC = pd.read_json(self.vic_file, orient="records", lines= True)
+        VFC = pd.read_json(self.vfc_file, orient="records", lines= True)
+        VIC = VIC.merge(all_commits[['commit_id', 'date']], on='commit_id', how='left')
+        VFC = VFC.merge(all_commits[['commit_id', 'date']], on='commit_id', how='left')
+        VIC = VIC.dropna(subset=["date"])
+        
+        VNC = all_commits[~all_commits['commit_id'].isin(VIC['commit_id']) & ~all_commits['commit_id'].isin(VFC['commit_id'])][['commit_id', 'date']]
+        VNC = VNC.drop_duplicates(subset="commit_id", keep="first")
+        VNC["Repository"] = self.repo_name
+        VNC.to_json(f"{self.save_path}/vnc_{self.repo_name}.jsonl", orient="records", lines=True)
+        
+        if self.lab:
+            data = self.link_label(VIC, VFC)
+        else:
+            merged = VNC.merge(VFC, on='commit_id', how='left') 
+            merged["Repository"] = merged["Repository_x"]   
+            merged["date"] = merged["date_x"]
+            merged = merged[["commit_id", "Repository", "date"]]
+
+            merged = merged.drop_duplicates(subset="commit_id", keep="first")
+            data = self.link_label(VIC, merged)
+            
         train, val, test = self.split(data)  
         self.link_data(train, val, test)
           
-    def link_label(self):
-        VIC = []
-        with open(self.label_file, "r") as f:
-            for line in f:
-                commit = json.loads(line.strip())
-                for vic in commit["VIC"]:
-                    VIC.append({
-                        "commit_id": vic,
-                        "label": 1
-                    })
-        label_df = pd.DataFrame(VIC)
-                       
-        commit_list_df = pd.read_json(self.commit_list, orient="records", lines=True)
-        merged = commit_list_df.merge(label_df, on='commit_id', how='left')
-        merged = merged.drop_duplicates(subset="commit_id", keep="first")
-
-        merged['label'] = merged['label'].fillna(0).astype(int)
-        save_file = f"{self.save_path}/labeled_commit_ids_{self.repo_name}.jsonl"
-        merged.to_json(save_file, orient="records", lines=True)
+    def link_label(self, pos, neg):
+        pos['label'] = 1
+        neg['label'] = 0
         
+        merged = pd.concat([pos, neg], axis=0)
         return merged
     
     def link_data(self, train, val, test):

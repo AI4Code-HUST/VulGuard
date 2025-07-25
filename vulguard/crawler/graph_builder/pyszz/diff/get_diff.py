@@ -1,11 +1,11 @@
 from collections import defaultdict
 
-from config import JOERN_PARSED_FUNCTIONS_OUTPUTS_DIR
-from file_manager import get_absolute_path, is_path_exist, join_path
-from helpers import get_logger, subprocess_cmd
+from vulguard.crawler.graph_builder.config import JOERN_PARSED_FUNCTIONS_OUTPUTS_DIR
+from vulguard.crawler.graph_builder.file_manager import get_absolute_path, is_path_exist, join_path
+from vulguard.crawler.graph_builder.helpers import get_logger, subprocess_cmd
 
 logger = get_logger(__name__)
-SCRIPT_PATH = "pyszz/diff/script/ansi2html.sh"
+SCRIPT_PATH = "vulguard/crawler/graph_builder/pyszz/diff/script/ansi2html.sh"
 
 
 def get_diff_file(commit, idx):

@@ -1,13 +1,9 @@
-from hashlib import sha256
 import pandas as pd
 import threading
-from file_manager import join_path, mkdir_if_not_exist, is_path_exist, write_file
-from joern.joern_parser import run_joern_text
-from config import JOERN_PARSED_FUNCTIONS_OUTPUTS_DIR
+from .file_manager import join_path, mkdir_if_not_exist, is_path_exist, write_file
+from .joern.joern_parser import run_joern_text
+from .config import JOERN_PARSED_FUNCTIONS_OUTPUTS_DIR
 
-
-# CSV_PATH = "data/extracted_output/project/FFmpeg_function_vtc.csv"
-#CSV_PATH = "data/jit_vul_dataset/vul_clean_commit_data_function_level.csv"
 
 NUMBER_THREAD = 2
 REFACTOR = False
@@ -48,25 +44,29 @@ def main():
     CSV_PATH = f"data/extracted_output/project/{p.project}_function_{p.file}.csv"
     
     datax = pd.read_csv(CSV_PATH, low_memory=False)
+    cpg_data_process(datax)
+    
+def cpg_data_process(df):
+    datax = df
     print(datax.shape)
     code_before = 'function_before'
     code_after = 'function_after'
     data = datax[datax[code_before].notna()]
     data = data[data[code_after].notna()]
-    print(data.shape)
+    # print(data.shape)
     threads = list()
     count = 0
     percent = 0
     commits = set(datax["commit_id"])
     size = len(commits)
-    print(size)
+    # print(size)
     
     for cm_id in list(commits)[::1]:
         count += 1
         # continue
         if int(100 * count/size) > percent:
             percent += 1
-            print_progressbar(percent)
+            # print_progressbar(percent)
         output_file_dir = join_path(JOERN_PARSED_FUNCTIONS_OUTPUTS_DIR, cm_id)
         rows = data.loc[data["commit_id"] == cm_id].reset_index()
         rows2 = datax.loc[datax["commit_id"] == cm_id].reset_index()

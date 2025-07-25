@@ -4,14 +4,11 @@ import threading
 
 import pandas as pd
 
-from config import JOERN_PARSED_FUNCTIONS_OUTPUTS_DIR
-from file_manager import is_path_exist, join_path, mkdir_if_not_exist, unlink
-from pyszz.ctg.generate_ctg import generate_ctg
-from pyszz.ctg.utils import *
+from .config import JOERN_PARSED_FUNCTIONS_OUTPUTS_DIR
+from .file_manager import is_path_exist, join_path, mkdir_if_not_exist, unlink
+from .pyszz.ctg.generate_ctg import generate_ctg
+from .pyszz.ctg.utils import *
 
-# CSV_PATH = "data/extracted_output/project/FFmpeg_function_vtc.csv"
-#CSV_PATH = "data/jit_vul_dataset/vul_triggering_commit_data_function_level.csv"
-#CSV_PATH = "data/jit_vul_dataset/vtc_old.csv"
 NUMBER_THREAD = 64
 
 def print_progressbar(percent):
@@ -55,7 +52,7 @@ def main():
         count += 1
         if int(100 * count/size) > percent:
             percent += 1
-            print_progressbar(percent)
+            # print_progressbar(percent)
         rows = data.loc[data["commit_id"] == cm_id].reset_index()
         rows2 = datax.loc[datax["commit_id"] == cm_id].reset_index()
         c = 0

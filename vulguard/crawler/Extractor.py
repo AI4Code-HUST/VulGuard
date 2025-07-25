@@ -132,9 +132,6 @@ class Extractor:
                 for word in line.split():
                     code_dict.add(word)
                     
-                    
-        # msg_dict.save_state(self.save_path)
-        # code_dict.save_state(self.save_path)
         
         pruned_msg_dict = msg_dict.prune(100000)
         pruned_code_dict = code_dict.prune(100000)

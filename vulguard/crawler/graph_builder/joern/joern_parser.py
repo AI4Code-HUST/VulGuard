@@ -1,6 +1,6 @@
-from config import BASE_DIR
-from file_manager import get_outer_dir, join_path, is_path_exist, mkdir_if_not_exist, get_file_name, remove_dir, unlink, write_file
-from helpers import get_logger, subprocess_cmd, get_current_timestamp, encode_special_characters_with_html_rules
+from vulguard.crawler.graph_builder.config import BASE_DIR
+from vulguard.crawler.graph_builder.file_manager import get_outer_dir, join_path, is_path_exist, mkdir_if_not_exist, get_file_name, remove_dir, unlink, write_file
+from vulguard.crawler.graph_builder.helpers import get_logger, subprocess_cmd, get_current_timestamp, encode_special_characters_with_html_rules
 import os
 CURRENT_DIR = get_outer_dir(__file__)
 JOERN_IMPORT_PATH = join_path(CURRENT_DIR, "joern_scripts", "import_code.scala")

@@ -3,10 +3,10 @@ import os
 
 import pandas
 
-from parse_joern import get_node_edges
+from .parse_joern import get_node_edges
 from queue import Queue
 
-from Joern_Node import NODE
+from .Joern_Node import NODE
 import multiprocessing as mp
 
 
@@ -93,8 +93,9 @@ def trim_CTG(row, idx, separate_token, graph_dir):
     if not os.path.isdir(edge_dir):
         os.makedirs(edge_dir)
     if os.path.exists(edge_dir + "/edge_{}.csv".format(commit_id)):
-       	print('already trim' + commit_id)
-        return  
+        print('already trim' + commit_id)
+        return
+    
     sub_graph_nodes = row["nodes"].split(separate_token)
     sub_graph_edges = row["edges"].split(separate_token)
     commit_nodes = []
@@ -176,17 +177,11 @@ def trim_CTG(row, idx, separate_token, graph_dir):
     all_edges.to_csv(edge_dir + "/edge_{}.csv".format(commit_id))
 
 pool = mp.Pool(mp.cpu_count())
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=str, help='path of the dataset file', default=".")
-    parser.add_argument('--graph', type=str, help='dir to save graph after trimming', default="OUTPUT")
-    args = parser.parse_args()
 
-    commit_raw_file_path = args.data
-    print(commit_raw_file_path)
-    df = pandas.read_csv(commit_raw_file_path)
+def trim(input, output):
+    df = pandas.read_csv(input)
     separate_token = "=" * 100
-    graph_dir = args.graph
+    graph_dir = output
     for idx, row in df.iterrows():
         commit_id = row["commit_id"]
         try:
@@ -198,3 +193,16 @@ if __name__ == '__main__':
             print("exception:", commit_id)
     pool.close()
     pool.join()
+    
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data', type=str, help='path of the dataset file', default=".")
+    parser.add_argument('--graph', type=str, help='dir to save graph after trimming', default="OUTPUT")
+    args = parser.parse_args()
+
+    commit_raw_file_path = args.data
+    output = args.graph
+    print(commit_raw_file_path)
+    trim(commit_raw_file_path, output)
+

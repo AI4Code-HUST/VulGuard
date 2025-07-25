@@ -1,7 +1,7 @@
 from collections import defaultdict
-from helpers import get_logger
-from szz.core.comment_parser import parse_comments_text
-from szz.core.function_parser import parse_functions_content
+from vulguard.crawler.graph_builder.helpers import get_logger
+from vulguard.crawler.graph_builder.pyszz.szz.core.comment_parser import parse_comments_text
+from vulguard.crawler.graph_builder.pyszz.szz.core.function_parser import parse_functions_content
 logger = get_logger(__name__)
 
 
