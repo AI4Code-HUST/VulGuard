@@ -9,6 +9,8 @@ services:
       - .:/app
     stdin_open: true
     tty: true
+    command: bash
+
     deploy:
       resources:
         reservations:

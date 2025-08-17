@@ -2,8 +2,6 @@ FROM ubuntu:22.04
 
 WORKDIR /app
 
-COPY . /app
-
 RUN apt-get update && apt-get install -y python3 python3-pip git vim wget zip unzip
 
 # Install srcML
@@ -44,8 +42,13 @@ ENV PATH="/opt/joern/joern-cli:${PATH}"
 ENV TZ=US/UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN pip install --no-cache-dir -r requirements.txt
+COPY . /app
 
-RUN bash scripts/install_torch.sh
+RUN chmod +x scripts/docker_entrypoint.sh && \
+    pip install --no-cache-dir -r requirements.txt
 
-RUN pip install -e .
+RUN chmod scripts/install_torch.sh && \
+    bash scripts/install_torch.sh
+
+ENTRYPOINT ["scripts/docker_entrypoint.sh"]
+# RUN pip install -e .
