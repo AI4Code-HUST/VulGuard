@@ -1,10 +1,11 @@
 #!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 
 vulguard inferencing \
-    -repo_name libssh2 \
-    -model deepjit \
+    -model lr \
+    -repo_name ffmpeg \
+    -repo_language C \
     -model_path dg_cache/save/libssh2 \
-    -infer_set dg_cache/dataset/libssh2/data/test_merge_libssh2.jsonl \
-    -dictionary dg_cache/dataset/libssh2/dict_libssh2.jsonl \
     -dg_save_folder . \
-    -device cuda
+    -infer_set $PARENT_DIR/sample/sample_test.jsonl 

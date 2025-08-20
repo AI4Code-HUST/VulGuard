@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
 
-pip install -e /app
+pip install -e .
 
 exec "$@"

@@ -1,8 +1,10 @@
 # Installation
 
-## Requirements
+VulGuard utilize multiple tools to build data and replicate models'results. Please install these dependencies before using models if you install VulGuard via Python packages. In addition, we offer installation via Docker. We encourage installation via Docker as all tools and dependencies would be installed.
 
-VulGuard utilize multiple tools to build data and replicate models'results. Please install these dependencies before using models.
+VulGuard has been tested on Linux, Windows and MacOS (via Docker with wsl2) 
+
+## Requirements
 
 ### Core Requirements  
 - Python >= 3.7
@@ -66,8 +68,6 @@ export PATH="dependencies/joern/joern-cli:${PATH}"
 ```
 
 ## Installation
-
-We offer installation via Docker and via Python packages. We encourage installation via Docker as all tools and dependencies would be installed. If you want to install from scratch using Python packages, please install your desired requirements.
 
 ### Install via Docker
 

@@ -43,9 +43,9 @@ This module contains JIT-VP model for vulnerability prediction.
   - Neural networks 
   - Graph Neural Networks 
 
-> You can easily **add your own models** or customize existing ones.
+- You can easily **add your own models** or customize existing ones.
 
-### 🧾 `docs/`
+### `docs/`
 Includes user guides, usage examples, and internal documentation.
 
 ## Extending VulGuard

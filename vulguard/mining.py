@@ -27,7 +27,11 @@ def mining(params):
         "end": params.end,
         "logger": logger,
         "vfc_file": params.vfc_file,
-        "lab": params.lab
+        "lab": params.lab,
+        "not_mine": params.mine,
+        "not_extract": params.extract,
+        "not_szz": params.szz,
+        "not_label": params.label,
     }
 
     cfg = Namespace(**cfg)    

@@ -17,47 +17,52 @@ def run(params):
         print(f"Deleted lock file: {lock_file}")
     else:
         print(f"No lock file found at: {lock_file}")
+    
+    if not params.not_miner:
+        print("Miner!")
+        print("=" * 20)
+        miner = Miner(params)
+        filtered_raw_commits = miner.run()
         
-    print("Miner!")
-    print("=" * 20)
-    miner = Miner(params)
-    filtered_raw_commits = miner.run()
     
+        print("=" * 20)
     
-    print("=" * 20)
-    df = pd.read_json(f"{params.dataset_save_path}/commit_ids_{params.repo_name}.jsonl", orient="records", lines=True)
-    filtered_raw_commits = list(df["commit_id"])
-    
-    print("Extractor!")
-    print("=" * 20)
-    extractor = Extractor(params)
-    extractor.run(filtered_raw_commits)
-    
-    print("=" * 20)
-    
-    print("SZZ!")
-    print("=" * 20)
-    szz_cfg = {
-        "input_jsonl": params.vfc_file if params.vfc_file is not None else f"{params.dataset_save_path}/vfc_{params.repo_name}.jsonl",
-        "save_path": params.dataset_save_path,
-        "conf": params.szz,
-        "num_core": params.workers,
-        "repo_name": params.repo_name,
-        "repos_dir": params.repo_path,
-    }
-    szz_cfg = argparse.Namespace(**szz_cfg)
-    SZZ(szz_cfg)
-    print("=" * 20)
+    if not params.not_extract:        
+        print("Extractor!")
+        print("=" * 20)
+        df = pd.read_json(f"{params.dataset_save_path}/commit_ids_{params.repo_name}.jsonl", orient="records", lines=True)
+        filtered_raw_commits = list(df["commit_id"])
 
-    print("Labeler!")
-    print("=" * 20)
-    label_cfg = {
-        "repo_name": params.repo_name,
-        "save_path": params.dataset_save_path,
-        "lab": params.lab,
-    }
-    label_cfg = argparse.Namespace(**label_cfg)
-    labeler = Labeler(label_cfg)
-    labeler.run()
-    print("=" * 20)
+        extractor = Extractor(params)
+        extractor.run(filtered_raw_commits)
+        
+        print("=" * 20)
+
+    if not params.not_szz:        
+        print("SZZ!")
+        print("=" * 20)
+        szz_cfg = {
+            "input_jsonl": params.vfc_file if params.vfc_file is not None else f"{params.dataset_save_path}/vfc_{params.repo_name}.jsonl",
+            "save_path": params.dataset_save_path,
+            "conf": params.szz,
+            "num_core": params.workers,
+            "repo_name": params.repo_name,
+            "repos_dir": params.repo_path,
+        }
+        szz_cfg = argparse.Namespace(**szz_cfg)
+        SZZ(szz_cfg)
+        print("=" * 20)
+
+    if not params.not_label:
+        print("Labeler!")
+        print("=" * 20)
+        label_cfg = {
+            "repo_name": params.repo_name,
+            "save_path": params.dataset_save_path,
+            "lab": params.lab,
+        }
+        label_cfg = argparse.Namespace(**label_cfg)
+        labeler = Labeler(label_cfg)
+        labeler.run()
+        print("=" * 20)
 

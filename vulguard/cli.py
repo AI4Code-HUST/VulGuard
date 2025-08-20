@@ -46,6 +46,10 @@ def main(args=None):
     mining_parser.add_argument("-end", type=int, default=None, help="Last commit index")
     mining_parser.add_argument("-vfc_file", type=int, default=None, help="VFC file")
     mining_parser.add_argument("-lab",action="store_true", help="Lab label using only vic and vfc")
+    mining_parser.add_argument("-not_mine",action="store_true", help="Do not mine repo")
+    mining_parser.add_argument("-not_extract",action="store_true", help="Do not extract features from raw data")
+    mining_parser.add_argument("-not_szz",action="store_true", help="Do not run szz algorithms")
+    mining_parser.add_argument("-not_label",action="store_true", help="Do not label and split data")
     
     graph_parser = argparse.ArgumentParser(parents=[common_parser], add_help=False)
     graph_parser.set_defaults(func=graph_builder)
@@ -61,8 +65,8 @@ def main(args=None):
     inferencing_parser.add_argument("-ranking", action="store_true", help="Ranking mode")
     inferencing_parser.add_argument("-predict", action="store_true", help="Predict mode")
     inferencing_parser.add_argument("-model_path", type=str, default=None, help="Path to pretrain models")
-    inferencing_parser.add_argument("-hyperparameters",type=str,default=None, help="")
-    inferencing_parser.add_argument("-dictionary",type=str,default=None, help="")
+    inferencing_parser.add_argument("-hyperparameters",type=str,default=None, help="Path to hyperparameter")
+    inferencing_parser.add_argument("-dictionary",type=str,default=None, help="Path to dictionary")
 
     training_parser = argparse.ArgumentParser(parents=[common_parser], add_help=False)
     training_parser.set_defaults(func=training)
@@ -73,9 +77,8 @@ def main(args=None):
     training_parser.add_argument("-model_path", type=str, default=None, help="Path to pretrain models")
     training_parser.add_argument("-train_set", type=str, default=None, help="")
     training_parser.add_argument("-val_set", type=str, default=None, help="")
-    training_parser.add_argument("-dictionary",type=str,default=None, help="")
-    training_parser.add_argument("-hyperparameters",type=str,default=None, help="")
-    
+    training_parser.add_argument("-hyperparameters",type=str,default=None, help="Path to hyperparameter")
+    training_parser.add_argument("-dictionary",type=str,default=None, help="Path to dictionary")
 
     evaluating_parser = argparse.ArgumentParser(parents=[common_parser], add_help=False)
     evaluating_parser.set_defaults(func=evaluating)
@@ -85,8 +88,8 @@ def main(args=None):
     evaluating_parser.add_argument("-model_path", type=str, default=None, help="Path to pretrain models")
     evaluating_parser.add_argument("-test_set", type=str, default=None, help="")
     evaluating_parser.add_argument("-size_set", type=str, default=None, help="File include number of added line and deleted line of each commit to get effort metrics.")
-    evaluating_parser.add_argument("-dictionary",type=str,default=None, help="")
-    evaluating_parser.add_argument("-hyperparameters",type=str,default=None, help="")
+    evaluating_parser.add_argument("-hyperparameters",type=str,default=None, help="Path to hyperparameter")
+    evaluating_parser.add_argument("-dictionary",type=str,default=None, help="Path to dictionary")
     
 
     parser = argparse.ArgumentParser(prog="VulGuard", description="A tool for mining, training, evaluating for Just-in-Time Vulnerability Prediction")

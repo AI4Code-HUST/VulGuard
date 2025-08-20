@@ -1,4 +1,5 @@
 #!/bin/bash
+bash clone_test_repo.sh
 
 vulguard mining \
     -repo_name libssh2 \
