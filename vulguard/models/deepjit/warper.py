@@ -1,6 +1,7 @@
 from vulguard.models.BaseWraper import BaseWraper
 import json, torch, os
 import torch.nn as nn
+from torchvision.ops.focal_loss import sigmoid_focal_loss
 from .model import DeepJITModel
 from .dataset import CustomDataset, get_data_loader
 from vulguard.utils.utils import open_jsonl
@@ -134,6 +135,8 @@ class DeepJIT(BaseWraper):
                 predict = self.model(message, code)
 
                 loss = criterion(predict, label)
+                # loss = sigmoid_focal_loss(predict, label)
+                
                 loss.backward()
                 self.total_loss = loss.item()
                 self.optimizer.step()
