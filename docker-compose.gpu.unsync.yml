@@ -1,0 +1,19 @@
+services:
+  vulguard-gpu:
+    container_name: vulguard-gpu
+    image: vulguard-gpu:latest
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    stdin_open: true
+    tty: true
+    command: bash
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

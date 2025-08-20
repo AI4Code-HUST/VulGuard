@@ -1,0 +1,11 @@
+services:
+  vulguard-cpu:
+    container_name: vulguard-cpu
+    image: vulguard-cpu:latest
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    stdin_open: true
+    tty: true
+    command: bash
