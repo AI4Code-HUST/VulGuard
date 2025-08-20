@@ -2,6 +2,7 @@ services:
   vulguard-gpu:
     container_name: vulguard-gpu
     image: vulguard-gpu:latest
+    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile.gpu

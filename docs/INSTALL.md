@@ -1,12 +1,21 @@
 # Installation
+VulGuard relies on multiple external tools to **build datasets** and **replicate model results**.  
 
-VulGuard utilize multiple tools to build data and replicate models'results. Please install these dependencies before using models if you install VulGuard via Python packages. In addition, we offer installation via Docker. We encourage installation via Docker as all tools and dependencies would be installed.
+### Option 1: Install from Source
+If you install VulGuard from source, please ensure that all required dependencies are installed beforehand. Refer to the documentation for a full list of dependencies.  
 
-VulGuard has been tested on Linux, Windows and MacOS (via Docker with wsl2) 
+### Option 2: Install via Docker (Recommended)
+We strongly recommend using the **Docker installation**, as it comes with all tools and dependencies preconfigured, ensuring a smooth setup experience.  
 
-## Requirements
+### Platform Support
+VulGuard has been tested on:  
+- **Linux** (native and via Docker)  
+- **Windows** (via Docker)  
+- **macOS** (via Docker)  
 
-### Core Requirements  
+## Dependencies
+
+### Core Dependencies  
 - Python >= 3.7
 - Git
 - srcML v1.0.0
@@ -25,8 +34,8 @@ wget https://github.com/srcML/srcML/releases/download/v1.0.0/srcml_1.0.0-1_ubunt
     rm -rf srcml_1.0.0-1_ubuntu20.04.deb
 ```
 
-### VCCFinder Requirements
-VCCFinder use [sally](https://github.com/rieck/sally) to vectorize extracted features for their Support Vector Machine models. 
+### VCCFinder Dependencies
+VCCFinder use [**sally**](https://github.com/rieck/sally) to vectorize extracted features for their Support Vector Machine models. 
 
 ```
 # sally dependencies
@@ -42,8 +51,8 @@ cd sally && ./bootstrap && \
     make install
 ```
 
-### Graph Builder Requirements
-CodeJIT use [Joern](https://github.com/joernio/joern) build code graph for their Graph Neural Network models. 
+### Graph Builder Dependencies
+CodeJIT use [**joern**](https://github.com/joernio/joern) build code graph for their Graph Neural Network models. 
 
 ```
 # joern dependencies jdk11, gcc
@@ -69,6 +78,8 @@ export PATH="dependencies/joern/joern-cli:${PATH}"
 
 ## Installation
 
+Ensure your machine has permission to execute all scripts in the [**`scripts`**](../scripts/) directory.
+
 ### Install via Docker
 
 **GPU-supported** 
@@ -79,34 +90,30 @@ bash scripts/setup_container_toolkit.sh
 
 # Build and exec vulguard container
 docker compose -f docker-compose.gpu.yml up -d --build
-docker exec -it vulguard-gpu /bin/bash
+docker start -ai vulguard-gpu
 ```
 
 **CPU-only**
  ```
 docker-compose -f docker-compose.cpu.yml up -d --build
-docker exec -it vulguard-cpu /bin/bash
+docker start -ai vulguard-cpu
 ```
 
 
-### Install via Python packages
+### Install from source
 
 **Create and activate a virtual environment**
 
 ```
 # create a virtual environment
-python3.11 -m venv env
+python -m venv ./venv
 
 # activate the environment
-. env/bin/activate
+source ./venv/bin/activate
 ```
 
-**Install VulGuard from PyPI or Build VulGuard from source**
+**Install from source**
 
 ```bash
-# install BARO from PyPI
-pip install vulguard
-
-# build BARO from source
 pip install -e .
 ```
